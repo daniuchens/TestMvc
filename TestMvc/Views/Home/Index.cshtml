@@ -1,7 +1,52 @@
 ﻿@{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "WebWorker Test";
 }
 
-<h2>Index</h2>
+<h1>WebWorker Test</h1>
+<hr/>
+<p>計數: <output id="result"></output></p>
+<button onclick="startWorker()">Start Worker</button>
+<button onclick="stopWorker()">Stop Worker</button>
+<button onclick="pushMessage()">Push Messgae</button>
 
-<h4>Hello World!!!</h4>
+@section Scripts {
+    <script src="@Url.Content("~/Scripts/demo_workers.js")"></script>
+    <script>
+        var w;
+
+        function startWorker()
+        {
+            console.log("start worker");
+            if (typeof (Worker) !== "undefined")
+            {
+                if(typeof(w)=="undefined")
+                {
+                    w = new Worker("@Url.Content("~/Scripts/demo_workers.js")");
+                    w.onmessage = updateData;
+                }
+            } else {
+                document.getElementById("result").innerHTML = "Sorry, your browser does not support Web Workers...";
+            }
+        }
+
+        function stopWorker()
+        {
+            w.terminate();
+            w = undefined;
+            console.log("stop worker");
+        }
+
+        function updateData(event)
+        {
+            document.getElementById("result").innerHTML = event.data;
+        }
+
+        function pushMessage()
+        {
+            if(typeof(w)!="undefined")
+            {
+                w.postMessage(5000);
+            }
+        }
+    </script>
+}
